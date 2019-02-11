@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LOGS" value="./logs" />
+	<appender name="SeverLogRollingFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ALL</level>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>DENY</onMatch>
+		</filter>
+
+		<file>${LOGS}/SeverLog.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>--time[%d{yyyy-MM-dd HH:mm:ss}] --Level[%-5p] --User[%X{userName}] --class[%C{1.}:%L] [%t] - %m%n</Pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily and when the file reaches 20 MegaBytes -->
+			<fileNamePattern>${LOGS}/archived/SeverLog-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>20MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			 <maxHistory>10</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="ErrorRollingFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<file>${LOGS}/ErrorLog.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d %p %C{1.}[%L] [%t] %m%n</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily and when the file reaches 20 MegaBytes -->
+			<fileNamePattern>${LOGS}/archived/ErrorLog-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>20MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			 <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	
+	<appender name="SqlQueryRollingFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGS}/QueryLog.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>--time[%d{yyyy-MM-dd HH:mm:ss}] --Level[%-5p]	--User[%X{userName}] --Report[%X{reportName}] --Filter[%X{filterName}] [%t] - %m%n</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily and when the file reaches 20 MegaBytes -->
+			<fileNamePattern>${LOGS}/archived/QueryLog-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>20MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			 <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} --Level[%-5p] --User[%X{userName}] --Report[%X{reportName}] --class[%C{1.}:%L] [%t] - %m%n</Pattern>
+		</layout>
+	</appender>
+	<root level="info">
+		<appender-ref ref="SeverLogRollingFile" />
+	</root>
+
+	<logger name="com.acnovate" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="ErrorRollingFile" />
+		<appender-ref ref="SeverLogRollingFile" />
+		<appender-ref ref="Console" />
+	</logger>
+
+	<logger name="org.hibernate.SQL" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="SqlQueryRollingFile" />
+	</logger>
+
+	<logger name="org.hibernate.type.descriptor.sql.BasicBinder"
+		additivity="false">
+		<level value="TRACE" />
+		<appender-ref ref="SqlQueryRollingFile" />
+	</logger>
+
+	<logger name="org.hibernate.engine.loading.LoadContexts"
+		additivity="false">
+		<level value="error" />
+		<appender-ref ref="ErrorRollingFile" />
+	</logger>
+
+
+</configuration>
