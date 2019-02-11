@@ -3,5 +3,5 @@ add target/app.jar /qiwk/app.jar
 ENV QIWK_REPORT_HOME '/qiwk'
 RUN mkdir /qiwk/config
 volume /qiwk/config
-EXPOSE 8080
+EXPOSE 8085
 ENTRYPOINT ["java","-jar","/qiwk/app.jar"]
